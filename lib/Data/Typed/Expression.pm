@@ -1,8 +1,12 @@
+package Data::Typed::Expression;
+
 use warnings;
 use strict;
 
 use Text::Balanced 'extract_bracketed';
 use 5.010;
+
+our $VERSION = '0.001';
 
 sub split_expr {
 
@@ -85,9 +89,10 @@ sub validate_typed_expr {
 	return $curr_type;
 }
 
-use Data::Dumper;
+#use Data::Dumper;
 
-my @split_expr = split_expr($ARGV[0]);
-say validate_typed_expr(@split_expr);
+#my @split_expr = split_expr($ARGV[0]);
+#say validate_typed_expr(@split_expr);
 
+1;
 
