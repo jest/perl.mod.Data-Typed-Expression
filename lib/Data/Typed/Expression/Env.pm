@@ -21,6 +21,19 @@ sub new {
 	return bless $self, $class;
 }
 
+sub new_with {
+	my ($self, $types, $vars) = @_;
+	my $t = {
+		%{$self->{t}},
+		%$types
+	};
+	my $v = {
+		%{$self->{v}},
+		%$vars
+	};
+	return (ref $self)->new($t, $v);
+}
+
 sub get_type_def {
 	return $_[0]->{t}{$_[1]};
 }
