@@ -7,6 +7,16 @@ use Carp 'croak';
 use warnings;
 use strict;
 
+=head1 NAME
+
+Data::Typed::Expression - Parsing typed expressions
+
+=head1 VERSION
+
+Version 0.001
+
+=cut
+
 our $VERSION = '0.001';
 
 sub new {
