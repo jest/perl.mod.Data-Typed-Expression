@@ -42,8 +42,9 @@ sub _check_const_type {
 
 sub _validate_tokens {
 	my ($self, $split_expr) = @_;
-
 	return '' unless @$split_expr;
+
+	$split_expr = [ @$split_expr ];
 
 	my $curr_var = shift @$split_expr;
 	my $curr_type = _check_const_type $curr_var;
