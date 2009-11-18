@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Data/Typed/Expression.pm
+lib/Data/Typed/Expression/Env.pm
+Makefile.PL
+MANIFEST
+META.yml
+LICENSE
+README
+t/00_load.t
+t/01_valid.t
+t/97_meta.t
+t/97_pod-coverage.t
+t/97_pod.t
+t/98_kwalitee.t
