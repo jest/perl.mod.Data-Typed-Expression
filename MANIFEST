@@ -2,10 +2,10 @@ Build.PL
 Changes
 lib/Data/Typed/Expression.pm
 lib/Data/Typed/Expression/Env.pm
+LICENSE
 Makefile.PL
 MANIFEST
 META.yml
-LICENSE
 README
 t/00_load.t
 t/01_valid.t
