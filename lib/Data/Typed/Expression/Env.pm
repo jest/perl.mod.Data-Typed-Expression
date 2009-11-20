@@ -65,21 +65,29 @@ sub _validate_tokens {
 		croak "Undefined var: $curr_var" unless exists $self->{v}{$curr_var};
 		$curr_type = $self->{v}{$curr_var};
 	}
-	
-	for (@$split_expr) {
-		if (ref $_) {
+
+	while (@$split_expr) {
+		my $e = shift @$split_expr;
+		if (ref $e) {
 			croak "Tried to index non-array type ($curr_type)"
 				unless $curr_type =~ /\[\]$/;
-			my $sub_type = $self->_validate_tokens($_);
+			my $sub_type = $self->_validate_tokens($e);
 			croak "Can't index $curr_type with non-int ($sub_type) type"
 				if $sub_type ne 'int';
 			$curr_type =~ s/\[\]$//;
+		} elsif ($e =~ /^(\+|-)/) {
+			croak "Tried to add to non-int type ($curr_type)"
+				unless $curr_type eq 'int';
+			my $rest_type = $self->_validate_tokens($split_expr);
+			croak "Can't add non-int type ($rest_type)"
+				unless $rest_type eq 'int';
+			return $curr_type;
 		} else {
 			croak "Tried to get elements of simple type ($curr_type)"
 				unless ref $self->{t}{$curr_type};
-			croak "Type $curr_type has no element named $_"
-				unless exists $self->{t}{$curr_type}{$_};
-			$curr_type = $self->{t}{$curr_type}{$_};
+			croak "Type $curr_type has no element named $e"
+				unless exists $self->{t}{$curr_type}{$e};
+			$curr_type = $self->{t}{$curr_type}{$e};
 		}
 	}
 	return $curr_type;

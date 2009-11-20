@@ -38,13 +38,16 @@ sub _split_expr {
 
 		if ($match) {
 			croak "Can't parse $expr"
-				unless length $prefix && $reminder =~ /^(\..+|$)/;
+				unless length $prefix && $reminder =~ /^(\..+|\+.+|-.*|$)/;
 			
 			push @resu, $prefix;
 			push @resu, [
 				_split_expr(substr $match, 1, length($match)-2)
 			];
 			($expr = $reminder) =~ s/^\.//;
+		} elsif ($expr =~ /^(\+|-)(.*)/) {
+			push @resu, $1;
+			$expr = $2 // '';
 		} elsif ($expr =~ /^([a-zA-Z_0-9]+)(\+|-)(.*)$/) {
 			push @resu, $1;
 			push @resu, $2;

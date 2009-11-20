@@ -42,7 +42,7 @@ my $t = sub {
 	lives_ok { $env->validate($expr) };
 };
 
-$t->($_) for qw( graph graph.v graph.v[someid] graph.v[0] );
+$t->($_) for qw( graph graph.v graph.v[someid] graph.v[0] graph.v[0+1] graph.v[someid+1] graph.v[1+someid+1] graph.v[1+graph.v[graph.v[0].id-1].id]);
 
 
 my $expr = new_ok( Data::Typed::Expression, [ 'ala.ma.kota' ] );
