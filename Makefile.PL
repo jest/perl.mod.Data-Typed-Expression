@@ -14,6 +14,7 @@ WriteMakefile(
         'Test::Exception' => 0.21,
         'Text::Balanced' => 0,
         'Carp' => 0,
+        'Parse::RecDescent' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Data-Typed-Expression-*' },

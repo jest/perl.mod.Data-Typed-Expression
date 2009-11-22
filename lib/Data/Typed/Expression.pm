@@ -2,6 +2,7 @@ package Data::Typed::Expression;
 
 use 5.010;
 use Text::Balanced qw( );
+use Parse::RecDescent;
 use Carp 'croak';
 
 use warnings;
@@ -61,6 +62,48 @@ sub _split_expr {
 		
 	@resu;
 }
+
+sub make_ast {
+	my ($expr) = @_;
+	my $grammar = <<'EOT';
+
+expression: full_expr /\z/ { $item[-2] }
+
+full_expr:
+	  expr_part expr_sep full_expr { { op => $item[-2], l => $item[-3], r => $item[-1] } }
+	| expr_part
+
+expr_part:
+	  '(' full_expr ')' { $item[-2] }
+	| indexed_expr
+	| var_name
+	| const
+
+expr_sep: m{[-+*/.]}
+
+indexed_expr: var_name indices { { op => '[]', l => $item[-2], r => $item[-1] } }
+
+indices: index(s)
+
+index: '[' full_expr ']' { $item[-2] }
+
+var_name: /[a-zA-Z_][a-zA-Z_0-9]*/ { { op => 'V', l => $item[-1] } }
+
+const: int | double
+
+int: /(\+|-)?\d+(?![\.0-9])/ { { op => 'I', l => $item[-1] } }
+
+double: /(\+|-)?\d+(\.\d+)?/ { { op => 'D', l => $item[-1] } }
+
+EOT
+
+	my $parser = Parse::RecDescent->new($grammar) or die "Bad grammar: $!";
+	my $ast = $parser->expression($expr);
+	defined $ast or print "Bad text: $expr\n";
+	$ast;
+}
+
+
 
 1;
 

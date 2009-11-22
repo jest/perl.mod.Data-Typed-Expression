@@ -10,6 +10,7 @@ my $build = Module::Build->new(
 	requires => {
 		'Carp' => 0,
 		'Text::Balanced' => 0,
+		'Parse::RecDescent' => 0,
 	},
 	build_requires => {
 		'Test::More' => 0,
