@@ -67,14 +67,26 @@ sub make_ast {
 	my ($expr) = @_;
 	my $grammar = <<'EOT';
 
+{
+sub _op {
+	if (@_ == 1) {
+		return { op => $_[0] };
+	} elsif (@_ == 2) {
+		return { op => $_[0], arg => $_[1] };
+	} else {
+		return { op => $_[0], arg => [ @_[1..$#_] ] };
+	}
+}
+}
+
 expression: full_expr /\z/ { $item[-2] }
 
 full_expr:
-	  expr_part expr_sep full_expr { { op => $item[-2], arg => [ $item[-3], $item[-1] ] } }
+	  expr_part expr_sep full_expr { _op $item[-2], $item[-3], $item[-1] }
 	| expr_part
 
 expr_part:
-	expr_noadd '.' expr_part { { op => $item[-2], arg => [ $item[-3], $item[-1] ] } } 
+	  expr_noadd '.' expr_part { _op $item[-2], $item[-3], $item[-1] } 
 	| expr_noadd
 
 expr_noadd:
@@ -85,19 +97,19 @@ expr_noadd:
 
 expr_sep: m{[-+*/]}
 
-indexed_expr: var_name indices { { op => '[]', arg => [ $item[-2], @{$item[-1]} ] } }
+indexed_expr: var_name indices { _op '[]', $item[-2], @{$item[-1]} }
 
 indices: index(s)
 
 index: '[' full_expr ']' { $item[-2] }
 
-var_name: /[a-zA-Z_][a-zA-Z_0-9]*/ { { op => 'V', arg => $item[-1] } }
+var_name: /[a-zA-Z_][a-zA-Z_0-9]*/ { _op 'V', $item[-1] }
 
 const: int | double
 
-int: /(\+|-)?\d+(?![\.0-9])/ { { op => 'I', arg => $item[-1] } }
+int: /(\+|-)?\d+(?![\.0-9])/ { _op 'I', $item[-1] }
 
-double: /(\+|-)?\d+(\.\d+)?/ { { op => 'D', arg => $item[-1] } }
+double: /(\+|-)?\d+(\.\d+)?/ { _op 'D', $item[-1] }
 
 EOT
 
