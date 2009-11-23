@@ -70,7 +70,7 @@ sub make_ast {
 expression: full_expr /\z/ { $item[-2] }
 
 full_expr:
-	  expr_part expr_sep full_expr { { op => $item[-2], l => $item[-3], r => $item[-1] } }
+	  expr_part expr_sep full_expr { { op => $item[-2], arg => [ $item[-3], $item[-1] ] } }
 	| expr_part
 
 expr_part:
@@ -81,19 +81,19 @@ expr_part:
 
 expr_sep: m{[-+*/.]}
 
-indexed_expr: var_name indices { { op => '[]', l => $item[-2], r => $item[-1] } }
+indexed_expr: var_name indices { { op => '[]', arg => [ $item[-2], @{$item[-1]} ] } }
 
 indices: index(s)
 
 index: '[' full_expr ']' { $item[-2] }
 
-var_name: /[a-zA-Z_][a-zA-Z_0-9]*/ { { op => 'V', l => $item[-1] } }
+var_name: /[a-zA-Z_][a-zA-Z_0-9]*/ { { op => 'V', arg => $item[-1] } }
 
 const: int | double
 
-int: /(\+|-)?\d+(?![\.0-9])/ { { op => 'I', l => $item[-1] } }
+int: /(\+|-)?\d+(?![\.0-9])/ { { op => 'I', arg => $item[-1] } }
 
-double: /(\+|-)?\d+(\.\d+)?/ { { op => 'D', l => $item[-1] } }
+double: /(\+|-)?\d+(\.\d+)?/ { { op => 'D', arg => $item[-1] } }
 
 EOT
 
