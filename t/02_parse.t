@@ -1,4 +1,4 @@
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Data::Typed::Expression;
 
 my %tests = (
@@ -44,6 +44,37 @@ $tests{'a[b].c'} = {
 	arg => [ $tests{'a[b]'}, { op => 'V', arg => 'c' } ]
 };
 $tests{'((a[(b)].c))'} = $tests{'a[b].c'};
+
+# operators priority
+$tests{'a.b+c.d[e+f+g]'} = {
+	op => '+',
+	arg => [
+		{
+			op => '.',
+			arg => [
+				{ op => 'V', arg => 'a' },
+				{ op => 'V', arg => 'b' },
+			]
+		}, 
+		{
+			op => '.',
+			arg => [
+				{ op => 'V', arg => 'c' },
+				{ op => '[]', arg => [
+					{ op => 'V', arg => 'd' },					
+					{ op => '+', arg => [
+						{ op => 'V', arg => 'e' },
+						{ op => '+', arg => [
+							{ op => 'V', arg => 'f' },
+							{ op => 'V', arg => 'g' }
+						]}
+					]}
+				]}
+			]
+		}, 
+	]
+};
+
 
 for (keys %tests) {
 	my $resu = Data::Typed::Expression::make_ast($_);

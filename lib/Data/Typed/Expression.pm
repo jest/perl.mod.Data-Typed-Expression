@@ -74,12 +74,16 @@ full_expr:
 	| expr_part
 
 expr_part:
+	expr_noadd '.' expr_part { { op => $item[-2], arg => [ $item[-3], $item[-1] ] } } 
+	| expr_noadd
+
+expr_noadd:
 	  '(' full_expr ')' { $item[-2] }
 	| indexed_expr
 	| var_name
 	| const
 
-expr_sep: m{[-+*/.]}
+expr_sep: m{[-+*/]}
 
 indexed_expr: var_name indices { { op => '[]', arg => [ $item[-2], @{$item[-1]} ] } }
 
