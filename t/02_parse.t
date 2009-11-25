@@ -77,7 +77,7 @@ $tests{'a.b+c.d[e+f+g]'} = {
 
 
 for (keys %tests) {
-	my $resu = Data::Typed::Expression::make_ast($_);
+	my $resu = Data::Typed::Expression::_make_ast($_);
 	use Data::Dumper;
 #	print Dumper($resu);
 	is_deeply($resu, $tests{$_}, "e := $_");

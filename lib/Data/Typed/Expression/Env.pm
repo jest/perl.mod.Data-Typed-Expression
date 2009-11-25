@@ -7,7 +7,58 @@ use Carp 'croak';
 use warnings;
 use strict;
 
+=head1 NAME
+
+Data::Typed::Expression::Env - Evalutation environment for typed expressions
+
+=head1 VERSION
+
+Version 0.001
+
+=cut
+
 our $VERSION = '0.001';
+
+=head1 METHODS
+
+=over
+
+=item new
+
+Creates a new enviroment in which expressions can be evaluated.
+
+Arguments are two hashrefs, the first one containing types declarations, the
+second one containing variables definitions.
+
+Each type declaration is a single hash entry, with type name being the key and
+type definition being the value.
+
+Type definition is either C<undef>, when there is nothing "internal" about the
+type or a hashref, for compound types. Each entry in compound type definition
+is a mapping from a compound element name to its type name.
+
+For example, if we define the C<car> type as having "color" property, which is
+represented as RGB triple, "price" as double and "name" as a string, the
+corresponding type definitions can look like:
+
+  {
+    color => {
+      color => 'color',
+      price => 'double',
+      name => 'string'
+    },
+    color => {
+      r => 'double',
+      g => 'double',
+      b => 'double'
+    },
+    double => undef,
+    string => undef
+  }
+
+Variables definition is a mapping from variable name to its type name.
+
+=cut
 
 sub new {
 	my ($class, $types, $vars) = @_;
@@ -21,6 +72,16 @@ sub new {
 	return bless $self, $class;
 }
 
+=item new_with
+
+Creates a new environment based on the current one.
+
+The created environment contains all the types and variables from the current
+environment, as well as the new types and variables passed as the arguments,
+in the same way as to L<new()> method.
+
+=cut
+
 sub new_with {
 	my ($self, $types, $vars) = @_;
 	my $t = {
@@ -29,7 +90,7 @@ sub new_with {
 	};
 	my $v = {
 		%{$self->{v}},
-		%$vars
+		%$vars                        
 	};
 	return (ref $self)->new($t, $v);
 }
@@ -41,6 +102,20 @@ sub get_type_def {
 sub get_var_type {
 	return $_[0]->{v}{$_[1]};
 }
+
+=item validate
+
+Checks if the given expression represents a valid one, in the context of the
+current environent.
+
+For expression to be valid, all used variables, types and components must exist
+in the environment, and appropriate operators arguments must be of special and
+coherent types (e.g. C<int> for array indexing or C<int> or C<double> for
+mathematical operations).
+
+Returns name of the type of passed expression.
+
+=cut
 
 sub validate {
 	return $_[0]->_validate_tokens($_[1]->{tok});

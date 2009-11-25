@@ -20,6 +20,65 @@ Version 0.001
 
 our $VERSION = '0.001';
 
+=head1 SYNOPSIS
+
+  use Data::Typed::Expression;
+  use Data::Typed::Expression::Env;
+  
+  my $env = Data::Typed::Expression::Env->new({
+      vertex => {
+		  id => 'int',
+		  lon => 'double',
+		  lat => 'double'
+	  },
+	  arc => {
+		  from => 'vertex',
+		  to => 'vertex',
+		  cost => 'double'
+	  },
+	  graph => {
+		  arcs => 'arc[]',
+		  vertices => 'vertex[]'
+	  },
+	  'int' => undef, 'double' => undef
+  }, {
+	  G => 'graph',
+	  i => 'int'
+  });
+  my $expr = Data::Typed::Expression->new('G.arcs[G.v[i]+1]');
+  
+  $env->validate($expr);
+                                                                    
+=head1 DESCRIPTION
+
+When I was writing LaTeX paper on mathematical model of an optimization problem,
+I was in a need to use C-like expressions to illustrate ideas I was writing
+about. I felt really uncomfortable beacuse I couldn't easily validate the
+expressions I was using. Hence this module.
+
+The module can parse standard C expressions (or rather a small subset of them)
+and validate them in the context of some types. Validation step checks if the
+types of values on which artihmetics is performed are numeric, whether array
+indices are of C<int> type and if compund types (C<struct>-s) have components
+referenced by the expression.
+
+The idea was born on this Perlmonks thread: L<TODO>.
+
+=head1 METHODS
+
+=cut
+
+
+=head2 new
+
+Creates a new expression object. The only argument is a string containing
+expression to be parsed.
+
+The method dies if the expression can't be parsed (i.e. is invalid or to
+complicated).
+
+=cut
+
 sub new {
 	my ($class, $str) = @_;
 	my @tokens = _split_expr($str);
@@ -63,7 +122,7 @@ sub _split_expr {
 	@resu;
 }
 
-sub make_ast {
+sub _make_ast {
 	my ($expr) = @_;
 	my $grammar = <<'EOT';
 

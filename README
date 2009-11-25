@@ -1,6 +1,9 @@
 Data-Typed-Expression
 
-TODO: small info here
+The modules are used to parse expressions of some C-like language. Expressions
+can contain binary arithmetic operators, numeric constants, array indexing and
+dot-notation for accessing structures' (or objects') members. Expression parsing
+is performed in a context of types system.
 
 INSTALLATION
 
