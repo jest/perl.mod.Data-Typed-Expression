@@ -82,8 +82,10 @@ complicated).
 sub new {
 	my ($class, $str) = @_;
 	my @tokens = _split_expr($str);
+	my $ast = _make_ast($str);
 	my $self = {
 		tok => \@tokens,
+		ast => $ast
 	};
 	return bless $self, $class;
 }
