@@ -9,7 +9,6 @@ my $build = Module::Build->new(
 	dist_author => 'Przemyslaw Wesolek <jest@go.art.pl>',
 	requires => {
 		'Carp' => 0,
-		'Text::Balanced' => 0,
 		'Parse::RecDescent' => 0,
 	},
 	build_requires => {

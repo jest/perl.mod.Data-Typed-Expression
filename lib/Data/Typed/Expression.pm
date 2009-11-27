@@ -1,7 +1,5 @@
 package Data::Typed::Expression;
 
-use 5.010;
-use Text::Balanced qw( );
 use Parse::RecDescent;
 use Carp 'croak';
 
@@ -81,47 +79,11 @@ complicated).
 
 sub new {
 	my ($class, $str) = @_;
-	my @tokens = _split_expr($str);
 	my $ast = _make_ast($str);
 	my $self = {
-		tok => \@tokens,
 		ast => $ast
 	};
 	return bless $self, $class;
-}
-
-sub _split_expr {
-	my ($expr) = @_;
-	my @resu;
-	
-	while (length $expr) {
-		my ($match, $reminder, $prefix) = Text::Balanced::extract_bracketed($expr,
-				'[', qr/[a-zA-Z_0-9]*/);
-
-		if ($match) {
-			croak "Can't parse $expr"
-				unless length $prefix && $reminder =~ /^(\..+|\+.+|-.*|$)/;
-			
-			push @resu, $prefix;
-			push @resu, [
-				_split_expr(substr $match, 1, length($match)-2)
-			];
-			($expr = $reminder) =~ s/^\.//;
-		} elsif ($expr =~ /^(\+|-)(.*)/) {
-			push @resu, $1;
-			$expr = $2 // '';
-		} elsif ($expr =~ /^([a-zA-Z_0-9]+)(\+|-)(.*)$/) {
-			push @resu, $1;
-			push @resu, $2;
-			$expr = $3 // '';
-		} else {
-			croak "Can't parse $expr" unless $expr =~ /^([a-zA-Z_0-9]+)(\.(.*))?$/;
-			push @resu, $1;
-			$expr = $3 // '';
-		}
-	}
-		
-	@resu;
 }
 
 sub _make_ast {
@@ -138,6 +100,25 @@ sub _op {
 		return { op => $_[0], arg => [ @_[1..$#_] ] };
 	}
 }
+sub _make_dot_ast {
+	my @it = @_;
+	my $tr = shift @it;
+	
+	for my $e (@it) {
+		my $op = $e->{op};
+		if ($op =~ /^[VID]$/) {
+			$tr = _op '.', $tr, $e;
+		} elsif ($op eq '[]') {
+			my $tr2 = _op '.', $tr, $e->{arg}[0];
+			$e->{arg}[0] = $tr2;
+			$tr = $e;
+		} else {
+			die "Unknown op: $op";
+		}
+	}
+	
+	$tr;
+}
 }
 
 expression: full_expr /\z/ { $item[-2] }
@@ -147,8 +128,7 @@ full_expr:
 	| expr_part
 
 expr_part:
-	  expr_noadd '.' expr_part { _op $item[-2], $item[-3], $item[-1] } 
-	| expr_noadd
+	expr_noadd(s /\./) { _make_dot_ast(@{$item[1]}) }
 
 expr_noadd:
 	  '(' full_expr ')' { $item[-2] }
@@ -179,8 +159,6 @@ EOT
 	defined $ast or print "Bad text: $expr\n";
 	$ast;
 }
-
-
 
 1;
 

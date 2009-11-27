@@ -1,7 +1,6 @@
 package Data::Typed::Expression::Env;
 
 use 5.010;
-use Text::Balanced 'extract_bracketed';
 use Carp 'croak';
 
 use warnings;
@@ -118,7 +117,8 @@ Returns name of the type of passed expression.
 =cut
 
 sub validate {
-	return $_[0]->_validate_tokens($_[1]->{tok});
+	#return $_[0]->_validate_tokens($_[1]->{tok});
+	return $_[0]->_validate_ast($_[1]->{ast});
 }
 
 sub _check_const_type {
@@ -166,6 +166,63 @@ sub _validate_tokens {
 		}
 	}
 	return $curr_type;
+}
+
+sub _validate_ast {
+	my ($self, $ast) = @_;
+	return '' unless defined $ast;
+	
+	my ($op, $arg) = (ref $ast) ?
+		($ast->{op}, $ast->{arg}) :
+		('V', $ast);
+
+	if ($op eq 'I') {
+		return 'int';
+	} elsif ($op eq 'D') {
+		return 'double';
+	} elsif ($op eq 'V') {
+		if (ref $arg) {
+			$arg = $arg->[0];
+		}
+		croak "Undefined var: $arg" unless exists $self->{v}{$arg};
+		return $self->{v}{$arg};
+	} elsif ($op eq '.') {
+		if (ref $arg->[1] && $arg->[1]{op} ne 'V') {
+			croak "Unexpected element type ($arg->[1]{op}) on right side of '.'";
+		}
+		my $subt = $self->_validate_ast($arg->[0]);
+		my $e = $arg->[1]{arg};
+		croak "Tried to get elements of simple type ($subt)"
+			unless ref $self->{t}{$subt};
+		croak "Type ($subt) has no element named $e"
+			unless exists $self->{t}{$subt}{$e};
+		return $self->{t}{$subt}{$e};
+	} elsif ($op =~ m{[-+*/]}) {
+		my $t = 'int';
+		for (@$arg) {
+			my $tt = $self->_validate_ast($_);
+			if ($tt eq 'int') {
+				# fine
+			} elsif ($tt eq 'double') {
+				$t = 'double';
+			} else {
+				croak "Arithmetic operation ($op) on non-numeric type ($t)";
+			}
+		}
+		return $t;
+	} elsif ($op eq '[]') {
+		my ($arr, @ind) = @$arg;
+		my $subt = $self->_validate_ast($arr);
+		for (@ind) {
+			my $indt = $self->_validate_ast($_);
+			croak "Can't index ($subt) with non-int ($indt) type"
+				if $indt ne 'int';
+		}
+		my $indbr = '[]' x int(@ind);
+		$subt =~ s/\Q$indbr\E$// or
+				croak "Tried to index non-array type ($subt) with ($indbr)";
+		return $subt; 
+	}
 }
 
 1;

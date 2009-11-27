@@ -38,8 +38,9 @@ my $vars = {
 
 my $env = new_ok( Data::Typed::Expression::Env, [ $types, $vars ] );
 my $t = sub {
-	my $expr = new_ok( Data::Typed::Expression, [ shift ] );
-	lives_ok { $env->validate($expr) };
+	my $s = shift;
+	my $expr = new_ok( Data::Typed::Expression, [ $s ] );
+	lives_ok { $env->validate($expr) } "e := $s";
 };
 
 $t->($_) for qw( graph graph.v graph.v[someid] graph.v[0] graph.v[0+1] graph.v[someid+1] graph.v[1+someid+1] graph.v[1+graph.v[graph.v[0].id-1].id]);
@@ -48,4 +49,5 @@ $t->($_) for qw( graph graph.v graph.v[someid] graph.v[0] graph.v[0+1] graph.v[s
 my $expr = new_ok( Data::Typed::Expression, [ 'ala.ma.kota' ] );
 dies_ok { $env->validate($expr) }
 
+# jedit :mode=perl:
 

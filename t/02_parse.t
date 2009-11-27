@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Data::Typed::Expression;
 
 my %tests = (
@@ -29,12 +29,12 @@ $tests{'a[b][c.d[123]]'} = {
 	arg => [
 		{ op => 'V', arg => 'a' },
 		{ op => 'V', arg => 'b' },
-		{ op => '.', arg => [
-			{ op => 'V', arg => 'c' },
-			{ op => '[]', arg => [
-				{ op => 'V', arg => 'd' },
-				{ op => 'I', arg => '123' }
-			]}
+		{ op => '[]', arg => [
+			{ op => '.', arg => [
+				{ op => 'V', arg => 'c' },
+				{ op => 'V', arg => 'd' }
+			]},
+			{ op => 'I', arg => '123' }
 		]}
 	]
 };
@@ -55,26 +55,37 @@ $tests{'a.b+c.d[e+f+g]'} = {
 				{ op => 'V', arg => 'a' },
 				{ op => 'V', arg => 'b' },
 			]
-		}, 
-		{
-			op => '.',
-			arg => [
-				{ op => 'V', arg => 'c' },
-				{ op => '[]', arg => [
-					{ op => 'V', arg => 'd' },					
-					{ op => '+', arg => [
-						{ op => 'V', arg => 'e' },
-						{ op => '+', arg => [
-							{ op => 'V', arg => 'f' },
-							{ op => 'V', arg => 'g' }
-						]}
-					]}
+		},
+
+
+		{ op => '[]', arg => [
+			{ op => '.', arg => [
+					{ op => 'V', arg => 'c' },
+					{ op => 'V', arg => 'd' }					
+				]
+			}, 
+			{ op => '+', arg => [
+				{ op => 'V', arg => 'e' },
+				{ op => '+', arg => [
+					{ op => 'V', arg => 'f' },
+					{ op => 'V', arg => 'g' }
 				]}
-			]
-		}, 
+			]}
+		]}
 	]
 };
 
+# multiple dots
+$tests{'a.b.c'} = {
+	op => '.',
+	arg => [
+		{ op => '.', arg => [
+			{ op => 'V', arg => 'a' },
+			{ op => 'V', arg => 'b' }
+		]},
+		{ op => 'V', arg => 'c' }
+	]
+};
 
 for (keys %tests) {
 	my $resu = Data::Typed::Expression::_make_ast($_);
@@ -86,3 +97,4 @@ for (keys %tests) {
 pass;
 
 # jedit :mode=perl:
+

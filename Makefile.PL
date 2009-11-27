@@ -12,7 +12,6 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More' => 0,
         'Test::Exception' => 0.21,
-        'Text::Balanced' => 0,
         'Carp' => 0,
         'Parse::RecDescent' => 0,
     },
