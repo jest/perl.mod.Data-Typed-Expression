@@ -25,4 +25,5 @@ provides:
     file: lib/Data/Typed/Expression/Env.pm
     version: 0.001
 resources:
+  repository: http://github.com/jest/perl.mod.Data-Typed-Expression
   license: http://opensource.org/licenses/artistic-license-2.0.php
