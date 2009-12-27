@@ -1,22 +1,18 @@
 ---
-name: Data-Typed-Expression
-version: 0.001
+abstract: 'Parsing typed expressions'
 author:
   - 'Przemyslaw Wesolek <jest@go.art.pl>'
-abstract: Parsing typed expressions
-license: artistic_2
 build_requires:
   Test::Exception: 0.21
   Test::More: 0
-requires:
-  Carp: 0
-  Parse::RecDescent: 0
 configure_requires:
-  Module::Build: 0.35
-generated_by: Module::Build version 0.35
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
+name: Data-Typed-Expression
 provides:
   Data::Typed::Expression:
     file: lib/Data/Typed/Expression.pm
@@ -24,6 +20,10 @@ provides:
   Data::Typed::Expression::Env:
     file: lib/Data/Typed/Expression/Env.pm
     version: 0.001
+requires:
+  Carp: 0
+  Parse::RecDescent: 0
 resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/jest/perl.mod.Data-Typed-Expression
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: 0.001
