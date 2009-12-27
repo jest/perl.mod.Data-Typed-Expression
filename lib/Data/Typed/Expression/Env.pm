@@ -1,6 +1,5 @@
 package Data::Typed::Expression::Env;
 
-use 5.010;
 use Carp 'croak';
 
 use warnings;
@@ -18,11 +17,19 @@ Version 0.001
 
 our $VERSION = '0.001';
 
+=head1 SYNOPSIS
+
+See L<Data::Typed::Expression>.
+
+=head1 DESCRIPTION
+
+An environment is an object describing known types and variables to be used by
+expressions of type L<Data::Typed::Expression>. Types can be marked as simple
+ones or defined as compounds (structures) with fields of other types.
+
 =head1 METHODS
 
-=over
-
-=item new
+=head2 new
 
 Creates a new enviroment in which expressions can be evaluated.
 
@@ -41,7 +48,7 @@ represented as RGB triple, "price" as double and "name" as a string, the
 corresponding type definitions can look like:
 
   {
-    color => {
+    car => {
       color => 'color',
       price => 'double',
       name => 'string'
@@ -61,8 +68,8 @@ Variables definition is a mapping from variable name to its type name.
 
 sub new {
 	my ($class, $types, $vars) = @_;
-	$vars //= { };
-	$types //= { };
+	$vars = { } unless defined $vars;
+	$types = { } unless defined $types;
 	my $self = {
 		t => $types,
 		v => $vars
@@ -71,13 +78,17 @@ sub new {
 	return bless $self, $class;
 }
 
-=item new_with
+=head2 new_with
 
 Creates a new environment based on the current one.
 
 The created environment contains all the types and variables from the current
 environment, as well as the new types and variables passed as the arguments,
 in the same way as to L<new()> method.
+
+If types or variables which are defined in the current object and also passed
+as parameters, definitions given in parameters override the current ones in the
+created object.
 
 =cut
 
@@ -94,15 +105,27 @@ sub new_with {
 	return (ref $self)->new($t, $v);
 }
 
+=head2 get_type_def
+
+Returns type definition for a given type name, as passed to L<new()>.
+
+=cut
+
 sub get_type_def {
 	return $_[0]->{t}{$_[1]};
 }
+
+=head2 get_var_type
+
+Returns variable type name, as passed to L<new()>.
+
+=cut
 
 sub get_var_type {
 	return $_[0]->{v}{$_[1]};
 }
 
-=item validate
+=head2 validate
 
 Checks if the given expression represents a valid one, in the context of the
 current environent.
@@ -117,55 +140,15 @@ Returns name of the type of passed expression.
 =cut
 
 sub validate {
-	#return $_[0]->_validate_tokens($_[1]->{tok});
 	return $_[0]->_validate_ast($_[1]->{ast});
 }
 
 sub _check_const_type {
-	return 'int' if $_[0] =~ /^\d+$/;
-	return 'double' if $_[0] =~ /^\d+\.\d+$/;
+	if ($_[0] =~ /^\d+(\.\d+)?$/) {
+		return (defined $2) ? 'double' : 'int';
+	} 
 	
 	undef;
-}
-
-sub _validate_tokens {
-	my ($self, $split_expr) = @_;
-	return '' unless @$split_expr;
-
-	$split_expr = [ @$split_expr ];
-
-	my $curr_var = shift @$split_expr;
-	my $curr_type = _check_const_type $curr_var;
-	unless (defined $curr_type) {
-		croak "Undefined var: $curr_var" unless exists $self->{v}{$curr_var};
-		$curr_type = $self->{v}{$curr_var};
-	}
-
-	while (@$split_expr) {
-		my $e = shift @$split_expr;
-		if (ref $e) {
-			croak "Tried to index non-array type ($curr_type)"
-				unless $curr_type =~ /\[\]$/;
-			my $sub_type = $self->_validate_tokens($e);
-			croak "Can't index $curr_type with non-int ($sub_type) type"
-				if $sub_type ne 'int';
-			$curr_type =~ s/\[\]$//;
-		} elsif ($e =~ /^(\+|-)/) {
-			croak "Tried to add to non-int type ($curr_type)"
-				unless $curr_type eq 'int';
-			my $rest_type = $self->_validate_tokens($split_expr);
-			croak "Can't add non-int type ($rest_type)"
-				unless $rest_type eq 'int';
-			return $curr_type;
-		} else {
-			croak "Tried to get elements of simple type ($curr_type)"
-				unless ref $self->{t}{$curr_type};
-			croak "Type $curr_type has no element named $e"
-				unless exists $self->{t}{$curr_type}{$e};
-			$curr_type = $self->{t}{$curr_type}{$e};
-		}
-	}
-	return $curr_type;
 }
 
 sub _validate_ast {

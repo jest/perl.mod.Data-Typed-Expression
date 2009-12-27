@@ -49,10 +49,10 @@ our $VERSION = '0.001';
                                                                     
 =head1 DESCRIPTION
 
-When I was writing LaTeX paper on mathematical model of an optimization problem,
-I was in a need to use C-like expressions to illustrate ideas I was writing
-about. I felt really uncomfortable beacuse I couldn't easily validate the
-expressions I was using. Hence this module.
+When I was writing a LaTeX paper on mathematical model of an optimization
+problem, I was in a need to use C-like expressions to illustrate ideas I was
+writing about. I felt really uncomfortable beacuse I couldn't easily validate
+the expressions I was using. Hence this module.
 
 The module can parse standard C expressions (or rather a small subset of them)
 and validate them in the context of some types. Validation step checks if the
@@ -60,7 +60,7 @@ types of values on which artihmetics is performed are numeric, whether array
 indices are of C<int> type and if compund types (C<struct>-s) have components
 referenced by the expression.
 
-The idea was born on this Perlmonks thread: L<TODO>.
+The idea was born on this Perlmonks thread: L<http://perlmonks.org/?node_id=807424>.
 
 =head1 METHODS
 
@@ -74,6 +74,9 @@ expression to be parsed.
 
 The method dies if the expression can't be parsed (i.e. is invalid or to
 complicated).
+
+Usefulness of an object itself is limited. Pass the object to e.g.
+L<Data::Typed::Expression::Env> to check type correctness of the expression.
 
 =cut
 
@@ -154,9 +157,9 @@ double: /(\+|-)?\d+(\.\d+)?/ { _op 'D', $item[-1] }
 
 EOT
 
-	my $parser = Parse::RecDescent->new($grammar) or die "Bad grammar: $!";
+	my $parser = Parse::RecDescent->new($grammar) or croak "Bad grammar: $!";
 	my $ast = $parser->expression($expr);
-	defined $ast or print "Bad text: $expr\n";
+	defined $ast or croak "Unparseable text: $expr\n";
 	$ast;
 }
 
