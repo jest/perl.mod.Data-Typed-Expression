@@ -11,11 +11,11 @@ Data::Typed::Expression::Env - Evalutation environment for typed expressions
 
 =head1 VERSION
 
-Version 0.001
+Version 0.002
 
 =cut
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ Creates a new environment based on the current one.
 
 The created environment contains all the types and variables from the current
 environment, as well as the new types and variables passed as the arguments,
-in the same way as to L<new()> method.
+in the same way as to L<new()|/new> method.
 
 If types or variables which are defined in the current object and also passed
 as parameters, definitions given in parameters override the current ones in the
@@ -107,7 +107,7 @@ sub new_with {
 
 =head2 get_type_def
 
-Returns type definition for a given type name, as passed to L<new()>.
+Returns type definition for a given type name, as passed to L<new()|/new>.
 
 =cut
 
@@ -117,7 +117,7 @@ sub get_type_def {
 
 =head2 get_var_type
 
-Returns variable type name, as passed to L<new()>.
+Returns variable type name, as passed to L<new()|/new>.
 
 =cut
 
