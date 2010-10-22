@@ -4,7 +4,7 @@ author:
   - 'Przemyslaw Wesolek <jest@go.art.pl>'
 build_requires:
   Test::Exception: 0.21
-  Test::More: 0
+  Test::More: 0.81_01
 configure_requires:
   Module::Build: 0.36
 generated_by: 'Module::Build version 0.3601'
@@ -16,14 +16,14 @@ name: Data-Typed-Expression
 provides:
   Data::Typed::Expression:
     file: lib/Data/Typed/Expression.pm
-    version: 0.002
+    version: 0.003
   Data::Typed::Expression::Env:
     file: lib/Data/Typed/Expression/Env.pm
-    version: 0.002
+    version: 0.003
 requires:
   Carp: 0
   Parse::RecDescent: 0
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/jest/perl.mod.Data-Typed-Expression
-version: 0.002
+version: 0.003

@@ -5,8 +5,8 @@ use Data::Typed::Expression;
 use Data::Typed::Expression::Env;
 
 # TODO: comment on deployment
-use Carp;
-$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+#use Carp;
+#$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 my $types = {
 	vertex => {

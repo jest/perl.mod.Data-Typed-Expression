@@ -10,7 +10,7 @@ WriteMakefile(
     LICENSE             => 'artistic_2',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More' => 0,
+        'Test::More' => 0.81_01,
         'Test::Exception' => 0.21,
         'Carp' => 0,
         'Parse::RecDescent' => 0,
