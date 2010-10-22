@@ -16,5 +16,10 @@ my $build = Module::Build->new(
 		'Test::Exception' => 0.21,
 	},
 	add_to_cleanup => [ 'Data-Typed-Expression-*' ],
+	meta_merge => {
+		resources => {
+			repository => 'http://github.com/jest/perl.mod.Data-Typed-Expression'
+		}
+	},
 );
 $build->create_build_script;
