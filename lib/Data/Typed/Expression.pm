@@ -25,23 +25,23 @@ our $VERSION = '0.003';
   
   my $env = Data::Typed::Expression::Env->new({
       vertex => {
-		  id => 'int',
-		  lon => 'double',
-		  lat => 'double'
-	  },
-	  arc => {
-		  from => 'vertex',
-		  to => 'vertex',
-		  cost => 'double'
-	  },
-	  graph => {
-		  arcs => 'arc[]',
-		  vertices => 'vertex[]'
-	  },
-	  'int' => undef, 'double' => undef
+          id  => 'int',
+          lon => 'double',
+          lat => 'double'
+      },
+      arc => {
+          from => 'vertex',
+          to   => 'vertex',
+          cost => 'double'
+      },
+      graph => {
+          arcs     => 'arc[]',
+          vertices => 'vertex[]'
+      },
+      'int' => undef, 'double' => undef
   }, {
-	  G => 'graph',
-	  i => 'int'
+      G => 'graph',
+      i => 'int'
   });
   my $expr = Data::Typed::Expression->new('G.arcs[G.v[i]+1]');
   
