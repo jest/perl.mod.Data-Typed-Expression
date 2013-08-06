@@ -9,13 +9,6 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
-
-(or using Makefile.PL and 'make')
-
     perl Makefile.PL
     make
     make test
